@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080914">
+<title>H_Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&family=Pacifico&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg:#080914;
+  --panel:rgba(20,22,43,.86);
+  --key:#20223b;
+  --text:#f7f5ff;
+  --muted:#969ab8;
+  --accent:#a78bfa;
+  --blue:#48d8ff;
+  --border:rgba(151,130,255,.22);
+}
+* {box-sizing:border-box}
+body {
+  margin:0; min-height:100vh; padding:24px 16px;
+  display:flex; flex-direction:column; align-items:center;
+  font-family:'Vazirmatn',sans-serif;color:var(--text);
+  background:
+    radial-gradient(ellipse at 15% 20%,#20205b66,transparent 42%),
+    radial-gradient(ellipse at 85% 75%,#102c5066,transparent 40%),
+    var(--bg);
+  transition:background .3s,color .3s;
+}
+body.light {
+  color-scheme:light;
+  --bg:#edf0ff;--panel:rgba(255,255,255,.9);
+  --key:#e7e9f8;--text:#17172d;--muted:#666987;
+  --accent:#7352e8;--blue:#087fba;--border:#c9c5f4;
+}
+button {font:inherit;cursor:pointer;touch-action:manipulation}
+.top {
+  width:min(100%,410px);display:flex;align-items:center;
+  justify-content:space-between;margin:12px 0 32px;
+}
+.brand {display:flex;align-items:center;gap:10px;direction:ltr}
+.brand-icon {
+  width:42px;height:42px;border-radius:14px;
+  display:grid;place-items:center;font-size:23px;
+  background:linear-gradient(135deg,#7955fa,#28c9ff);
+  box-shadow:0 0 25px #7955fa55;
+}
+.brand-name {font-size:18px;font-weight:700;letter-spacing:.5px}
+.small-btn {
+  width:42px;height:42px;border:1px solid var(--border);
+  border-radius:14px;background:var(--panel);color:var(--text);
+}
+main {width:min(100%,410px)}
+.eyebrow {
+  text-align:center;color:var(--blue);font-size:11px;
+  letter-spacing:3px;margin-bottom:9px;direction:ltr;
+}
+h1 {
+  text-align:center;font-size:clamp(25px,7vw,33px);
+  margin:0 0 8px;font-weight:700;letter-spacing:-1px;
+}
+.subtitle {text-align:center;color:var(--muted);font-size:13px;margin:0 0 26px}
+.calculator {
+  padding:19px;border:1px solid var(--border);border-radius:27px;
+  background:var(--panel);backdrop-filter:blur(20px);
+  box-shadow:0 20px 70px #0004,0 0 35px #8866ff0d;
+}
+.display {
+  min-height:140px;padding:12px 8px 20px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  align-items:flex-end;overflow:hidden;
+}
+.expression {
+  min-height:25px;color:var(--muted);font-size:14px;
+  direction:ltr;text-align:right;width:100%;
+  overflow-wrap:anywhere;
+}
+.result {
+  width:100%;text-align:right;direction:ltr;
+  font-size:clamp(35px,10vw,48px);font-weight:500;
+  letter-spacing:-1px;overflow-wrap:anywhere;
+  color:var(--text);line-height:1.35;
+}
+.keys {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.key {
+  min-width:0;height:61px;border:1px solid transparent;
+  border-radius:17px;background:var(--key);color:var(--text);
+  font-size:21px;font-weight:500;
+  transition:transform .12s,filter .12s,border-color .12s;
+}
+.key:hover {filter:brightness(1.18);border-color:var(--border)}
+.key:active {transform:scale(.94)}
+.key.utility {color:var(--blue);background:#16304788}
+.key.operator {
+  color:var(--accent);background:#3b286588;
+  font-size:25px;
+}
+.key.equals {
+  color:white;background:linear-gradient(135deg,#8057f5,#4c8cff);
+  box-shadow:0 5px 22px #7657f455;
+}
+.key.zero {grid-column:span 2}
+.hint {
+  text-align:center;color:var(--muted);font-size:11px;
+  margin:17px 0 0;direction:rtl;
+}
+footer {margin-top:auto;padding-top:36px;text-align:center}
+.signature {
+  direction:ltr;font-family:'Pacifico',cursive;font-size:27px;
+  color:var(--accent);text-shadow:0 0 18px #9775ff70;
+}
+.footer-line {font-size:10px;color:var(--muted);margin-top:8px}
+@media(max-width:360px) {
+  .calculator{padding:13px}
+  .keys{gap:7px}
+  .key{height:55px;border-radius:14px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="brand-icon">⌗</div>
+    <div class="brand-name">H_Calculator</div>
+  </div>
+  <button class="small-btn" id="theme" aria-label="تغییر تم" title="تغییر تم">☼</button>
+</header>
+
+<main>
+  <div class="eyebrow">SMART · SIMPLE · NEON</div>
+  <h1>حساب کن، ساده‌تر</h1>
+  <p class="subtitle">ماشین‌حساب نئونی تو</p>
+
+  <section class="calculator" aria-label="ماشین حساب">
+    <div class="display" aria-live="polite">
+      <div class="expression" id="expression"></div>
+      <div class="result" id="result">۰</div>
+    </div>
+
+    <div class="keys" id="keys">
+      <button class="key utility" data-action="clear">پاک</button>
+      <button class="key utility" data-action="sign">±</button>
+      <button class="key utility" data-action="percent">٪</button>
+      <button class="key operator" data-op="÷">÷</button>
+
+      <button class="key" data-num="7">۷</button>
+      <button class="key" data-num="8">۸</button>
+      <button class="key" data-num="9">۹</button>
+      <button class="key operator" data-op="×">×</button>
+
+      <button class="key" data-num="4">۴</button>
+      <button class="key" data-num="5">۵</button>
+      <button class="key" data-num="6">۶</button>
+      <button class="key operator" data-op="−">−</button>
+
+      <button class="key" data-num="1">۱</button>
+      <button class="key" data-num="2">۲</button>
+      <button class="key" data-num="3">۳</button>
+      <button class="key operator" data-op="+">+</button>
+
+      <button class="key zero" data-num="0">۰</button>
+      <button class="key" data-action="decimal">٫</button>
+      <button class="key equals" data-action="equals">=</button>
+    </div>
+    <p class="hint">با کیبورد هم می‌تونی محاسبه کنی ⌨</p>
+  </section>
+</main>
+
+<footer>
+  <div class="signature">Hesam</div>
+  <div class="footer-line">ساخته‌شده با دقت و خلاقیت</div>
+</footer>
+
+<script>
+(() => {
+  const result = document.getElementById('result');
+  const expression = document.getElementById('expression');
+  const keys = document.getElementById('keys');
+
+  let current = '0';
+  let stored = null;
+  let operator = null;
+  let resetNext = false;
+  let finished = false;
+  let history = '';
+
+  const faDigits = '۰۱۲۳۴۵۶۷۸۹';
+  const enDigits = '0123456789';
+
+  function localize(value) {
+    return String(value).replace(/\d/g, d => faDigits[Number(d)])
+      .replace('.', '٫').replace('-', '−');
+  }
+
+  function format(value) {
+    if (!Number.isFinite(value)) return 'خطا';
+    if (Object.is(value, -0)) value = 0;
+    let str = String(Number(value.toPrecision(12)));
+    if (str.length > 16) str = value.toExponential(7);
+    return localize(str);
+  }
+
+  function draw() {
+    result.textContent = current === 'خطا' ? current : format(Number(current));
+    expression.textContent = history || (stored !== null && operator
+      ? format(stored) + ' ' + operator : '');
+  }
+
+  function clear() {
+    current = '0'; stored = null; operator = null;
+    resetNext = false; finished = false; history = '';
+    draw();
+  }
+
+  function inputNumber(n) {
+    if (current === 'خطا' || resetNext || finished) {
+      current = n; resetNext = false; finished = false; history = '';
+    } else if (current.replace('-', '').replace('.', '').length < 14) {
+      current = current === '0' ? n : current + n;
+    }
+    draw();
+  }
+
+  function decimal() {
+    if (current === 'خطا' || resetNext || finished) {
+      current = '0.'; resetNext = false; finished = false; history = '';
+    } else if (!current.includes('.')) current += '.';
+    draw();
+  }
+
+  function calculate(a, op, b) {
+    let answer;
+    if (op === '+') answer = a + b;
+    if (op === '−') answer = a - b;
+    if (op === '×') answer = a * b;
+    if (op === '÷') {
+      if (b === 0) return null;
+      answer = a / b;
+    }
+    return Number.isFinite(answer) ? answer : null;
+  }
+
+  function chooseOperator(nextOp) {
+    if (current === 'خطا') return;
+    const value = Number(current);
+    if (operator && !resetNext) {
+      const answer = calculate(stored, operator, value);
+      if (answer === null) {
+        current = 'خطا'; stored = null; operator = null;
+        history = 'تقسیم بر صفر ممکن نیست'; draw(); return;
+      }
+      current = String(answer);
+      stored = answer;
+    } else {
+      stored = value;
+    }
+    operator = nextOp;
+    resetNext = true;
+    finished = false;
+    history = format(stored) + ' ' + operator;
+    draw();
+  }
+
+  function equals() {
+    if (!operator || stored === null || current === 'خطا') return;
+    const a = stored, b = Number(current), op = operator;
+    const answer = calculate(a, op, b);
+    history = format(a) + ' ' + op + ' ' + format(b) + ' =';
+    if (answer === null) {
+      current = 'خطا';
+      history = b === 0 && op === '÷'
+        ? 'تقسیم بر صفر ممکن نیست' : 'عدد خارج از محدوده است';
+    } else {
+      current = String(answer);
+    }
+    stored = null; operator = null;
+    resetNext = true; finished = true;
+    draw();
+  }
+
+  function percent() {
+    if (current === 'خطا') return;
+    current = String(Number(current) / 100);
+    resetNext = true; finished = false;
+    draw();
+  }
+
+  function sign() {
+    if (current === 'خطا') return;
+    if (Number(current) !== 0) current = String(-Number(current));
+    draw();
+  }
+
+  function backspace() {
+    if (current === 'خطا' || resetNext || finished) {
+      current = '0'; resetNext = false; finished = false;
+    } else {
+      current = current.length > 1 ? current.slice(0, -1) : '0';
+      if (current === '-' || current === '') current = '0';
+    }
+    draw();
+  }
+
+  keys.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+
+    if (button.dataset.num !== undefined) inputNumber(button.dataset.num);
+    else if (button.dataset.op) chooseOperator(button.dataset.op);
+    else {
+      switch (button.dataset.action) {
+        case 'clear': clear(); break;
+        case 'decimal': decimal(); break;
+        case 'equals': equals(); break;
+        case 'percent': percent(); break;
+        case 'sign': sign(); break;
+      }
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (/^[0-9]$/.test(event.key)) inputNumber(event.key);
+    else if (event.key === '.') decimal();
+    else if (event.key === 'Enter' || event.key === '=') {
+      event.preventDefault(); equals();
+    }
+    else if (event.key === 'Backspace') backspace();
+    else if (event.key === 'Escape' || event.key === 'Delete') clear();
+    else if (event.key === '+') chooseOperator('+');
+    else if (event.key === '-') chooseOperator('−');
+    else if (event.key === '*') chooseOperator('×');
+    else if (event.key === '/') {
+      event.preventDefault(); chooseOperator('÷');
+    }
+    else if (event.key === '%') percent();
+  });
+
+  document.getElementById('theme').addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    const light = document.body.classList.contains('light');
+    document.getElementById('theme').textContent = light ? '☾' : '☼';
+    document.querySelector('meta[name="theme-color"]')
+      .setAttribute('content', light ? '#edf0ff' : '#080914');
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
